@@ -2,15 +2,16 @@ const WebSocket = require('ws')
 const express = require('express')
 const moment = require('moment')
 const app = express()
-const port = 7878; //port for https
+const port = process.env.PORT || 8000; //port for https
 
 app.get('/', (req, res) => {
     res.send("Hello World");
 });
 
 app.listen(port, () => {
-    console.log(`Example app listening at http://localhost:${port}`)
+    console.log(`Example app listening at ${port}`)
 });
+
 var  webSockets = {}
 
 const wss = new WebSocket.Server({ port: 6060 }) //run websocket server with port 6060
@@ -53,7 +54,7 @@ wss.on('connection', function (ws, req)  {
 
     ws.on('close', function () {
         var userID = req.url.substr(1)
-        delete webSockets[userID] //on connection close, remove reciver from connection list
+        // delete webSockets[userID] //on connection close, remove reciver from connection list
         console.log('User Disconnected: ' + userID)
     })
     
