@@ -60,7 +60,7 @@ wss.on('connection', function (ws, req) {
                 if (data.cmd == 'send') {
                     var boardws = webSockets[data.userid] //check if there is reciever connection
                     if (boardws) {
-                        var cdata = "{'cmd':'" + data.cmd + "','userid':'" + data.userid + "','date':'" + data.date + "', 'msgtext':'" + data.msgtext + "'}";
+                        var cdata = "{'cmd':'" + data.cmd + "','userid':'" + data.userid + "','date':'" + data.date + "','from':'" + data.from + "', 'msgtext':'" + data.msgtext + "'}";
                         boardws.send(cdata); //send message to reciever
                         ws.send(data.cmd + ":success");
                     } else {
@@ -72,7 +72,7 @@ wss.on('connection', function (ws, req) {
                     var boardws = webSockets[data.userid] //check if there is reciever connection
                     if(boardws){
                         let users = readFile()
-                        var cdata = "{'cmd':'" + data.cmd + "','userid':'" + data.userid + "','date':'" + data.date + "', 'users':'" + users + "'}";
+                        var cdata = "{'cmd':'" + data.cmd + "','userid':'" + data.userid + "','date':'" + data.date + "', 'users':" + users + "}";
                         boardws.send(cdata); //send message to reciever
                         ws.send(data.cmd + ":success");
                     }
