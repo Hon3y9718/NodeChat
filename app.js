@@ -67,7 +67,7 @@ wss.on('connection', function (ws, req) {
                         ws.send(data.cmd + ":error");
                     }
                 } 
-                if(data.cms == 'getUsers'){
+                if(data.cmd == 'getUsers'){
                     var boardws = webSockets[data.userid] //check if there is reciever connection
                     if(boardws){
                         let users = readFile()
