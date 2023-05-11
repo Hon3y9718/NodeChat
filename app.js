@@ -40,54 +40,62 @@ function addConnection(socketId) {
 
 var webSockets = {}
 
-const wss = new WebSocket.Server({ port: 6060 }) //run websocket server with port 6060
-wss.on('connection', function (ws, req) {
-    var userID = req.url.substring(1) //get userid from URL ip:6060/userid 
-    webSockets[userID] = ws //add new user to the connection list
+// const wss = new WebSocket.Server({ port: 6060 }) //run websocket server with port 6060
+const wss = new WebSocket.Server({ noServer: true })
 
-    addConnection(userID)
-    console.log('User ' + userID + ' Connected ')
-
-    ws.on('message', message => { //if there is any message
-        console.log(message);
-        var datastring = message.toString();
-        if (datastring.charAt(0) == "{") {
-            datastring = datastring.replace(/\'/g, '"');
-            var data = JSON.parse(datastring)
-            if (data.auth == "chatapphdfgjd34534hjdfk") {
-                if (data.cmd == 'send') {
-                    var boardws = webSockets[data.userid] //check if there is reciever connection
-                    if (boardws) {
-                        var cdata = "{'cmd':'" + data.cmd + "','userid':'" + data.userid + "','date':'" + data.date + "', 'msgtext':'" + data.msgtext + "'}";
-                        boardws.send(cdata); //send message to reciever
-                        ws.send(data.cmd + ":success");
+app.on('upgrade', (req, socket, head) => {
+    wss.handleUpgrade(req, socket, head, (ws) => {
+        wss.on('connection', function (ws, req) {
+            var userID = req.url.substring(1) //get userid from URL ip:6060/userid 
+            webSockets[userID] = ws //add new user to the connection list
+        
+            addConnection(userID)
+            console.log('User ' + userID + ' Connected ')
+        
+            ws.on('message', message => { //if there is any message
+                console.log(message);
+                var datastring = message.toString();
+                if (datastring.charAt(0) == "{") {
+                    datastring = datastring.replace(/\'/g, '"');
+                    var data = JSON.parse(datastring)
+                    if (data.auth == "chatapphdfgjd34534hjdfk") {
+                        if (data.cmd == 'send') {
+                            var boardws = webSockets[data.userid] //check if there is reciever connection
+                            if (boardws) {
+                                var cdata = "{'cmd':'" + data.cmd + "','userid':'" + data.userid + "','date':'" + data.date + "', 'msgtext':'" + data.msgtext + "'}";
+                                boardws.send(cdata); //send message to reciever
+                                ws.send(data.cmd + ":success");
+                            } else {
+                                console.log("No reciever user found.");
+                                ws.send(data.cmd + ":error");
+                            }
+                        } else {
+                            console.log("No send command");
+                            ws.send(data.cmd + ":error");
+                        }
                     } else {
-                        console.log("No reciever user found.");
+                        console.log("App Authincation error");
                         ws.send(data.cmd + ":error");
                     }
                 } else {
-                    console.log("No send command");
+                    console.log("Non JSON type data");
                     ws.send(data.cmd + ":error");
                 }
-            } else {
-                console.log("App Authincation error");
-                ws.send(data.cmd + ":error");
-            }
-        } else {
-            console.log("Non JSON type data");
-            ws.send(data.cmd + ":error");
-        }
+            })
+        
+            ws.on('close', function () {
+                var userID = req.url.substring(1)
+                // delete webSockets[userID] //on connection close, remove reciver from connection list
+                console.log('User Disconnected: ' + userID)
+            })
+        
+            ws.send('connected'); //innitial connection return message
+            // debugger;
+        })
+        
     })
-
-    ws.on('close', function () {
-        var userID = req.url.substring(1)
-        // delete webSockets[userID] //on connection close, remove reciver from connection list
-        console.log('User Disconnected: ' + userID)
-    })
-
-    ws.send('connected'); //innitial connection return message
-    // debugger;
 })
+
 
 app.listen(port, () => {
     console.log(`Example app listening at ${port}`)
