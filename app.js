@@ -2,6 +2,7 @@ const WebSocket = require('ws')
 // const express = require('express')
 const moment = require('moment')
 const fs = require('fs');
+const { json } = require('express');
 // const file = require("./public/connections.json")
 // const app = express()
 const port = process.env.PORT || 7878; //port for https
@@ -20,7 +21,7 @@ function readFile(){
     let filePath = "./public/connecntion.json"
     const jsonString = fs.readFileSync(filePath);
     fileData = JSON.parse(jsonString);
-    return fileData
+    return jsonString
 }
 
 let fileData = [];
