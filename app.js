@@ -66,7 +66,17 @@ wss.on('connection', function (ws, req) {
                         console.log("No reciever user found.");
                         ws.send(data.cmd + ":error");
                     }
-                } else {
+                } 
+                if(data.cms == 'getUsers'){
+                    var boardws = webSockets[data.userid] //check if there is reciever connection
+                    if(boardws){
+                        let users = readFile()
+                        var cdata = "{'cmd':'" + data.cmd + "','userid':'" + data.userid + "','date':'" + data.date + "', 'users':'" + users + "'}";
+                        boardws.send(cdata); //send message to reciever
+                        ws.send(data.cmd + ":success");
+                    }
+                }
+                else {
                     console.log("No send command");
                     ws.send(data.cmd + ":error");
                 }
