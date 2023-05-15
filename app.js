@@ -77,6 +77,17 @@ wss.on('connection', function (ws, req) {
                         ws.send(data.cmd + ":success");
                     }
                 }
+                else if(data.cmd == 'sendImage'){
+                    var boardws = webSockets[data.userid] //check if there is reciever connection
+                    if (boardws) {
+                        var cdata = "{'cmd':'" + data.cmd + "','userid':'" + data.userid + "','date':'" + data.date + "','from':'" + data.from + "', 'msgtext':'" + data.msgtext + "', 'fileName':'" + data.fileName + "'}";
+                        boardws.send(cdata); //send message to reciever
+                        ws.send(data.cmd + ":success");
+                    } else {
+                        console.log("No reciever user found.");
+                        ws.send(data.cmd + ":error");
+                    }
+                }
                 else {
                     console.log("No send command");
                     ws.send(data.cmd + ":error");
